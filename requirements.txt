@@ -32,3 +32,5 @@ redis==6.4.0
 pydantic[email]==2.11.7
 # Reads environment variables from a .env file for managing application configuration.
 python-dotenv==1.1.1
+# Settings management using Pydantic, for handling application configuration.
+pydantic-settings==2.10.1
