@@ -9,6 +9,7 @@ This project is a robust, scalable web application built with FastAPI and Celery
 -   **Scalable Architecture**: The separation of the web server and background workers allows for independent scaling.
 -   **Containerized**: Fully containerized with Docker and orchestrated with Docker Compose for a consistent and reproducible environment.
 -   **Relational Database**: Uses PostgreSQL to persist task information.
+-   **Configuration Management**: Centralized configuration using Pydantic's `BaseSettings`.
 -   **Data Validation**: Leverages Pydantic for robust request and response data validation.
 
 ## Technology Stack
@@ -19,7 +20,7 @@ This project is a robust, scalable web application built with FastAPI and Celery
 -   **Message Broker**: [Redis](https://redis.io/)
 -   **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 -   **ORM**: [SQLAlchemy](https://www.sqlalchemy.org/)
--   **Data Validation**: [Pydantic](https://docs.pydantic.dev/)
+-   **Data Validation & Configuration**: [Pydantic](https://docs.pydantic.dev/)
 
 ## Project Structure
 
@@ -27,6 +28,7 @@ This project is a robust, scalable web application built with FastAPI and Celery
 .
 ├── app/
 │   ├── __init__.py
+│   ├── config.py       # Application configuration management
 │   ├── crud.py         # Database Create, Read, Update, Delete operations
 │   ├── database.py     # Database engine and session configuration
 │   ├── main.py         # FastAPI application and API endpoints
@@ -35,6 +37,7 @@ This project is a robust, scalable web application built with FastAPI and Celery
 │   └── worker.py       # Celery worker and task definitions
 ├── docker-compose.yml  # Defines and configures all services
 ├── Dockerfile          # Docker configuration for the API and worker
+├── env.template        # Template for environment variables
 ├── requirements.txt    # Python project dependencies
 └── README.md           # This file
 ```
@@ -55,7 +58,14 @@ Follow these steps to get the application up and running.
     cd <repository-directory>
     ```
 
-2.  **Build and run the services**:
+2.  **Create the environment configuration file**:
+    Copy the template to a new `.env` file. This file contains the necessary environment variables for the database and other services.
+    ```sh
+    cp env.template .env
+    ```
+    You can modify the values in `.env` if needed, but the defaults are configured to work with Docker Compose.
+
+3.  **Build and run the services**:
     Use Docker Compose to build the images and start all the containers (API, worker, PostgreSQL, and Redis) in detached mode.
     ```sh
     docker-compose up -d --build
