@@ -33,7 +33,7 @@ def get_db():
 	finally:
 		db.close()
 
-@app.post("/api/tasks", response_model=schemas.TaskResponse, status_code=202)
+@app.post("/api/v1/tasks", response_model=schemas.TaskResponse, status_code=202)
 def create_analysis_task(task: schemas.TaskCreate, db: Session = Depends(get_db)):
 	"""Create a new analysis task and enqueue it for processing.
 
@@ -67,7 +67,7 @@ def create_analysis_task(task: schemas.TaskCreate, db: Session = Depends(get_db)
 	return {"task_id":db_task.id}
 
 
-@app.get("/api/tasks/{task_id}", response_model=schemas.TaskStatus)
+@app.get("/api/v1/tasks/{task_id}", response_model=schemas.TaskStatus)
 def get_task_status(task_id: uuid.UUID, db: Session = Depends(get_db)):
 	"""Retrieves a specific task from the database by its ID.
 
