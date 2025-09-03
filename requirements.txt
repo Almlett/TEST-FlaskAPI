@@ -8,27 +8,27 @@
 
 # --- Web Framework ---
 # A modern, high-performance web framework for building APIs.
-fastapi=0.116.1
+fastapi==0.116.1
 
 # --- ASGI Server ---
 # A lightning-fast ASGI server, required to run the FastAPI application.
-uvicorn=0.35.0
+uvicorn==0.35.0
 
 # --- Database & ORM ---
 # The SQL toolkit and Object-Relational Mapper (ORM) for database interaction.
-sqlalchemy=2.0.43
+sqlalchemy==2.0.43
 # PostgreSQL database adapter for Python, allowing SQLAlchemy to communicate with a PostgreSQL database.
-psycopg2-binary=2.9.10
+psycopg2-binary==2.9.10
 
 # --- Background Tasks ---
 # An asynchronous task queue for running background jobs (e.g., sending emails, processing data).
-celery=5.5.3
+celery==5.5.3
 # The Python client for Redis, often used as a message broker for Celery and for caching.
-redis=6.4.0
+redis==6.4.0
 
 # --- Data Validation & Configuration ---
 # Data validation and settings management using Python type hints. Used by FastAPI for request/response models.
 # The [email] extra adds email validation capabilities.
-pydantic[email]=2.11.7
+pydantic[email]==2.11.7
 # Reads environment variables from a .env file for managing application configuration.
-python-dotenv=1.1.1
+python-dotenv==1.1.1
