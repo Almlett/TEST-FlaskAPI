@@ -19,6 +19,8 @@ uvicorn==0.35.0
 sqlalchemy==2.0.43
 # PostgreSQL database adapter for Python, allowing SQLAlchemy to communicate with a PostgreSQL database.
 psycopg2-binary==2.9.10
+# Database migration tool for SQLAlchemy
+alembic==1.13.2
 
 # --- Background Tasks ---
 # An asynchronous task queue for running background jobs (e.g., sending emails, processing data).
