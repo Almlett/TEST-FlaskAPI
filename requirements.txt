@@ -36,3 +36,9 @@ pydantic[email]==2.11.7
 python-dotenv==1.1.1
 # Settings management using Pydantic, for handling application configuration.
 pydantic-settings==2.10.1
+
+# --- Testing ---
+# A framework for writing and running tests.
+pytest==8.2.2
+# A fully featured HTTP client for Python, used for testing HTTP endpoints.
+httpx==0.27.0

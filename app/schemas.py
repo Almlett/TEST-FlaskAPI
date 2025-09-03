@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from enum import Enum
 from uuid import UUID
-
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 class TaskStatusEnum(str, Enum):
 	"""An enumeration for the possible statuses of a task.
@@ -19,13 +18,16 @@ class TaskStatusEnum(str, Enum):
 	FAILED = "FAILED"
 
 
-class TaskCreate(BaseModel):
-	"""Schema for creating a new task.
+class TaskBase(BaseModel):
+	"""Base schema for a task, defining the core field."""
 
-	Attributes:
-		text (str): The input text to be processed.
-	"""
-	text: str
+	text: str = Field(..., min_length=1, description="The text content of the task.")
+
+
+class TaskCreate(TaskBase):
+	"""Schema for creating a new task. Inherits from TaskBase."""
+
+	pass
 
 
 class TaskResponse(BaseModel):
@@ -35,6 +37,13 @@ class TaskResponse(BaseModel):
 		task_id (UUID): The unique identifier of the created task.
 	"""
 	task_id: UUID
+
+
+class Task(BaseModel):
+	"""Schema for a task as stored in the database, including its ID."""
+
+	id: UUID
+	model_config = ConfigDict(from_attributes=True)
 
 
 class TaskStatus(BaseModel):
@@ -48,8 +57,5 @@ class TaskStatus(BaseModel):
 	id: UUID
 	status: str
 	result: dict | None = None
-
-	class Config:
-		"""Pydantic configuration options."""
-		orm_mode = True
+	model_config = ConfigDict(from_attributes=True)
 
