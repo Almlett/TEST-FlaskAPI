@@ -30,11 +30,7 @@ services:
     volumes:
       - .:/app
     # Sets environment variables for the application.
-    environment:
-      # The connection string for the PostgreSQL database.
-      - DATABASE_URL=postgresql://test_user:test_pass@db/test_database
-      # Adds the application directory to the Python path.
-      - PYTHONPATH=/app
+    env_file: .env
     # Specifies that the 'api' service depends on 'db' and 'redis'.
     # Docker Compose will start 'db' and 'redis' before starting 'api'.
     depends_on:
@@ -56,9 +52,7 @@ services:
     volumes:
       - .:/app
     # Sets the same environment variables as the 'api' service.
-    environment:
-      - DATABASE_URL=postgresql://test_user:test_pass@db/test_database
-      - PYTHONPATH=/app
+    env_file: .env
     # The worker depends on Redis (as a message broker) and the database.
     depends_on:
       - redis
@@ -71,11 +65,7 @@ services:
     # Uses the official PostgreSQL version 13 image from Docker Hub.
     image: postgres:13
     # Sets environment variables to configure the PostgreSQL instance.
-    # These credentials must match the DATABASE_URL in the 'api' and 'worker' services.
-    environment:
-      - POSTGRES_USER=test_user
-      - POSTGRES_PASSWORD=test_pass
-      - POSTGRES_DB=test_database
+    env_file: .env
     # Mounts a named volume to persist database data across container restarts.
     volumes:
       - postgres_data:/var/lib/postgresql/data/

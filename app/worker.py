@@ -4,12 +4,13 @@ import time
 from celery import Celery
 
 from app import models
+from app.config import settings
 from app.database import SessionLocal
 
 celery_app = Celery(
 	"worker",
-	broker="redis://redis:6379/0",
-	backend="redis://redis:6379/0"
+	broker=settings.CELERY_BROKER_URL,
+	backend=settings.CELERY_RESULT_BACKEND,
 )
 
 
