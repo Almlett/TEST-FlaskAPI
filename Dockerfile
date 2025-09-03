@@ -11,10 +11,16 @@ FROM python:3.10-slim
 # All subsequent commands (like COPY, RUN, CMD) will be executed from this path.
 WORKDIR /app
 
+# Create a non-root user and group to run the application
+RUN groupadd -r appgroup && useradd --no-log-init -r -g appgroup appuser
+
 # Copies the Python dependencies file from the host machine to the container's
 # working directory. This is done as a separate step to leverage Docker's layer
 # caching. If requirements.txt doesn't change, this layer won't be rebuilt.
 COPY requirements.txt .
+
+# Upgrade pip to the latest version to ensure compatibility with the packages
+RUN pip install --upgrade pip
 
 # Installs the Python packages listed in requirements.txt using pip.
 # The '--no-cache-dir' flag is used to prevent pip from storing the package
@@ -24,6 +30,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copies the rest of the application's source code from the current directory
 # on the host machine into the container's working directory ('/app').
 COPY . .
+
+# Change the ownership of the application files to the new user
+RUN chown -R appuser:appgroup /app
+
+# Switch to the non-root user
+USER appuser
 
 # Sets the PYTHONPATH environment variable to the application's root directory.
 # This ensures that Python can find the application's modules and packages
