@@ -11,6 +11,8 @@ This project is a robust, scalable web application built with FastAPI and Celery
 -   **Relational Database**: Uses PostgreSQL to persist task information.
 -   **Configuration Management**: Centralized configuration using Pydantic's `BaseSettings`.
 -   **Data Validation**: Leverages Pydantic for robust request and response data validation.
+-   **Database Migrations**: Uses Alembic to manage database schema migrations.
+-   **Testing**: Unit and integration tests with Pytest.
 
 ## Technology Stack
 
@@ -21,25 +23,30 @@ This project is a robust, scalable web application built with FastAPI and Celery
 -   **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
 -   **ORM**: [SQLAlchemy](https://www.sqlalchemy.org/)
 -   **Data Validation & Configuration**: [Pydantic](https://docs.pydantic.dev/)
+-   **Migrations**: [Alembic](https://alembic.sqlalchemy.org/)
+-   **Testing**: [Pytest](https://docs.pytest.org/)
 
 ## Project Structure
 
 ```
 .
+├── alembic/              # Alembic migration configuration and scripts
+├── alembic.ini           # Alembic configuration file
 ├── app/
 │   ├── __init__.py
-│   ├── config.py       # Application configuration management
-│   ├── crud.py         # Database Create, Read, Update, Delete operations
-│   ├── database.py     # Database engine and session configuration
-│   ├── main.py         # FastAPI application and API endpoints
-│   ├── models.py       # SQLAlchemy database models
-│   ├── schemas.py      # Pydantic schemas for data validation
-│   └── worker.py       # Celery worker and task definitions
-├── docker-compose.yml  # Defines and configures all services
-├── Dockerfile          # Docker configuration for the API and worker
-├── env.template        # Template for environment variables
-├── requirements.txt    # Python project dependencies
-└── README.md           # This file
+│   ├── config.py         # Application configuration management
+│   ├── crud.py           # Database Create, Read, Update, Delete operations
+│   ├── database.py       # Database engine and session configuration
+│   ├── main.py           # FastAPI application and API endpoints
+│   ├── models.py         # SQLAlchemy database models
+│   ├── schemas.py        # Pydantic schemas for data validation
+│   └── worker.py         # Celery worker and task definitions
+├── tests/                # Application tests
+├── docker-compose.yml    # Defines and configures all services
+├── Dockerfile            # Docker configuration for the API and worker
+├── env.template          # Template for environment variables
+├── requirements.txt      # Python project dependencies
+└── README.md             # This file
 ```
 
 ## Prerequisites
@@ -72,13 +79,19 @@ Follow these steps to get the application up and running.
     ```
     The API will be available at `http://localhost:8000`.
 
+4.  **Run database migrations**:
+    To create the tables in the database, run the following command:
+    ```sh
+    docker-compose exec api alembic upgrade head
+    ```
+
 ## API Documentation
 
 ### 1. Create a new analysis task
 
 Submits a new text for analysis. The task is added to a queue for background processing.
 
--   **URL**: `/api/tasks`
+-   **URL**: `/api/v1/tasks`
 -   **Method**: `POST`
 -   **Status Code**: `202 Accepted`
 -   **Request Body**:
@@ -102,7 +115,7 @@ Submits a new text for analysis. The task is added to a queue for background pro
 
 Retrieves the status and result of a specific task using its ID.
 
--   **URL**: `/api/tasks/{task_id}`
+-   **URL**: `/api/v1/tasks/{task_id}`
 -   **Method**: `GET`
 -   **URL Params**:
     -   `task_id=[uuid]` (Required) - The ID of the task to retrieve.
@@ -146,12 +159,12 @@ Retrieves the status and result of a specific task using its ID.
 
 ## Application Workflow
 
-1.  A client sends a `POST` request with text to the `/api/tasks` endpoint.
+1.  A client sends a `POST` request with text to the `/api/v1/tasks` endpoint.
 2.  The **FastAPI application** validates the input, creates a new task record in the **PostgreSQL** database with a `PENDING` status, and returns a `task_id`.
 3.  The API then enqueues a new job in the **Celery** task queue via the **Redis** message broker.
 4.  A **Celery worker** picks up the job from the queue.
 5.  The worker updates the task status to `IN_PROGRESS`, performs the text analysis (simulated with a delay), and updates the task record in the database with the `COMPLETED` status and the analysis result.
-6.  The client can poll the `/api/tasks/{task_id}` endpoint to check the status and retrieve the result once the task is complete.
+6.  The client can poll the `/api/v1/tasks/{task_id}` endpoint to check the status and retrieve the result once the task is complete.
 
 ## Managing the Application
 
@@ -172,4 +185,9 @@ Retrieves the status and result of a specific task using its ID.
 
     # View logs for a specific service (e.g., the api)
     docker-compose logs -f api
+    ```
+
+-   **Run tests**:
+    ```sh
+    docker-compose exec api pytest
     ```
