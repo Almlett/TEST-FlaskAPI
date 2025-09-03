@@ -1,47 +1,98 @@
+# Docker Compose configuration for a multi-container web application.
+#
+# This file defines the services, networks, and volumes required to run the
+# application stack, which consists of a web API, a background worker, a
+# PostgreSQL database, and a Redis instance.
+#
+# To run the application:
+#   - Start all services in detached mode: `docker-compose up -d`
+#   - Stop and remove all containers: `docker-compose down`
+#   - View logs for all services: `docker-compose logs -f`
+#   - View logs for a specific service: `docker-compose logs -f api`
+
 version: '3.8'
 
 services:
+  # The 'api' service is the main web application entry point.
+  # It builds the Docker image from the current directory's Dockerfile,
+  # exposes the application on port 8000, and connects to the database
+  # and Redis services.
   api:
+    # Builds the image using the Dockerfile in the current directory.
     build: .
+    # Assigns a specific, predictable name to the container.
     container_name: project_api
+    # Maps port 8000 on the host machine to port 8000 in the container.
     ports:
       - "8000:8000"
+    # Mounts the current directory on the host to /app in the container,
+    # allowing for live code reloading during development.
     volumes:
       - .:/app
+    # Sets environment variables for the application.
     environment:
+      # The connection string for the PostgreSQL database.
       - DATABASE_URL=postgresql://test_user:test_pass@db/test_database
+      # Adds the application directory to the Python path.
       - PYTHONPATH=/app
+    # Specifies that the 'api' service depends on 'db' and 'redis'.
+    # Docker Compose will start 'db' and 'redis' before starting 'api'.
     depends_on:
       - db
       - redis
 
+  # The 'worker' service runs background tasks using Celery.
+  # It uses the same application code and environment as the 'api' service
+  # but runs a different command to start the Celery worker process.
   worker:
+    # Assigns a specific, predictable name to the container.
     container_name: project_worker
+    # Builds the image using the Dockerfile in the current directory.
     build: .
+    # Overrides the default command to start a Celery worker.
+    # It listens for tasks from the 'app.worker.celery_app' module.
     command: "celery -A app.worker.celery_app worker --loglevel=info"
+    # Mounts the current directory for live code reloading.
     volumes:
       - .:/app
+    # Sets the same environment variables as the 'api' service.
     environment:
       - DATABASE_URL=postgresql://test_user:test_pass@db/test_database
       - PYTHONPATH=/app
+    # The worker depends on Redis (as a message broker) and the database.
     depends_on:
       - redis
       - db
 
+  # The 'db' service is the PostgreSQL database for the application.
   db:
+    # Assigns a specific, predictable name to the container.
     container_name: project_db
+    # Uses the official PostgreSQL version 13 image from Docker Hub.
     image: postgres:13
+    # Sets environment variables to configure the PostgreSQL instance.
+    # These credentials must match the DATABASE_URL in the 'api' and 'worker' services.
     environment:
       - POSTGRES_USER=test_user
       - POSTGRES_PASSWORD=test_pass
       - POSTGRES_DB=test_database
+    # Mounts a named volume to persist database data across container restarts.
     volumes:
       - postgres_data:/var/lib/postgresql/data/
 
+  # The 'redis' service provides an in-memory data store.
+  # It is used as a message broker for Celery to manage the task queue
+  # and can also be used for caching.
   redis:
+    # Assigns a specific, predictable name to the container.
     container_name: project_redis
+    # Uses a lightweight, Alpine-based Redis 6.2 image.
     image: redis:6.2-alpine
 
+# Defines the named volumes used by the services.
 volumes:
+  # 'postgres_data' is a managed volume used by the 'db' service to persist
+  # the PostgreSQL database files on the host machine, ensuring data is not
+  # lost when the container is stopped or removed.
   postgres_data:
 
