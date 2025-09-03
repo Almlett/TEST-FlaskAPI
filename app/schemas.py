@@ -1,7 +1,22 @@
 # -*- coding: utf-8 -*-
+from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel
+
+class TaskStatusEnum(str, Enum):
+	"""An enumeration for the possible statuses of a task.
+
+	Attributes:
+		PENDING (str): The task has been created but has not yet started.
+		IN_PROGRESS (str): The task is currently being executed.
+		COMPLETED (str): The task has finished successfully.
+		FAILED (str): The task has failed during execution.
+	"""
+	PENDING = "PENDING"
+	IN_PROGRESS = "IN_PROGRESS"
+	COMPLETED = "COMPLETED"
+	FAILED = "FAILED"
 
 
 class TaskCreate(BaseModel):

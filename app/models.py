@@ -2,11 +2,11 @@
 import datetime
 import uuid
 
-from sqlalchemy import JSON, Column, DateTime, String
+from sqlalchemy import JSON, Column, DateTime, String, Enum as SQLAlchemyEnum
 from sqlalchemy.dialects.postgresql import UUID
 
 from app.database import Base
-
+from app.schemas import TaskStatusEnum
 
 class Task(Base):
 	"""A SQLAlchemy model representing a text processing task.
@@ -28,7 +28,7 @@ class Task(Base):
 	__tablename__ = "tasks"
 	id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 	text = Column(String, nullable=False)
-	status = Column(String, default="PENDING")
+	status = Column(SQLAlchemyEnum(TaskStatusEnum), default=TaskStatusEnum.PENDING, nullable=False)
 	result = Column(JSON, nullable=True)
 	created_at = Column(DateTime, default=datetime.datetime.now)
 	updated_at = Column(DateTime, default=datetime.datetime.now, onupdate=datetime.datetime.now)
